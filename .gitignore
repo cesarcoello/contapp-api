@@ -1,4 +1,17 @@
+# Entorno virtual
+env/
+
+# Archivos de configuración de Python
+__pycache__/
+*.py[cod]
+
+# Archivos de configuración de Docker
+*.db
+*.sqlite3
+.dockerignore
+
+# Archivos de entorno
 .env
-__pycache__
-*.pyc
-*.pyo
+
+# Archivos de logs
+*.log
