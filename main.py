@@ -6,6 +6,7 @@ from utils.database import fetch_query_as_json
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,7 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True
 )
-
 
 @app.get("/")
 async def read_root():
