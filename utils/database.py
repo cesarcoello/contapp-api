@@ -1,23 +1,54 @@
-# utils/database.py
-import pyodbc
 from dotenv import load_dotenv
 import os
+import pyodbc
+import logging
+import json
 
-load_dotenv()  # Carga las variables de entorno desde .env
+load_dotenv()
 
-# Configuración de conexión
-server = os.getenv("SQL_SERVER")
-database = os.getenv("SQL_DATABASE")
-username = os.getenv("SQL_USERNAME")
-password = os.getenv("SQL_PASSWORD")
-driver = os.getenv("SQL_DRIVER")
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def get_connection():
+driver = os.getenv('SQL_DRIVER')
+server = os.getenv('SQL_SERVER')
+database = os.getenv('SQL_DATABASE')
+username = os.getenv('SQL_USERNAME')
+password = os.getenv('SQL_PASSWORD')
+
+connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}"
+
+async def get_db_connection():
     try:
-        connection = pyodbc.connect(
-            f'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-        )
-        return connection
-    except Exception as e:
-        print(f"Error al conectar a la base de datos: {e}")
-        return None
+        logger.info(f"Intentando conectar a la base de datos con la cadena de conexión: {connection_string}")
+        conn = pyodbc.connect(connection_string, timeout=10)
+        logger.info("Conexión exitosa a la base de datos.")
+        return conn
+    except pyodbc.Error as e:
+        logger.error(f"Database connection error: {str(e)}")
+        raise Exception(f"Database connection error: {str(e)}")
+
+async def fetch_query_as_json(query, is_procedure=False):
+    conn = await get_db_connection()
+    cursor = conn.cursor()
+    logger.info(f"Ejecutando query: {query}")
+    try:
+        cursor.execute(query)
+
+        if is_procedure and cursor.description is None:
+            conn.commit()
+            return json.dumps([{"status": 200, "message": "Procedure executed successfully"}])
+
+        columns = [column[0] for column in cursor.description]
+        results = []
+        logger.info(f"Columns: {columns}")
+        for row in cursor.fetchall():
+            results.append(dict(zip(columns, row)))
+
+        return json.dumps(results)
+
+    except pyodbc.Error as e:
+        raise Exception(f"Error ejecutando el query: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()

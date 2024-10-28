@@ -1,28 +1,33 @@
+import json
+import uvicorn
+from typing import Union
 from fastapi import FastAPI, HTTPException
-from utils.database import get_cursor
-from utils.database import get_connection
+from utils.database import fetch_query_as_json
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True
+)
+
 
 @app.get("/")
-def read_root():
-    return {"message": "API funcionando correctamente"}
-
-@app.get("/datos")
-def obtener_datos():
+async def read_root():
+    query = "select * from contapp.personas"
     try:
-        cursor = get_cursor()
-        cursor.execute("SELECT * FROM <tu_tabla>")  # Asegúrate de que esta tabla exista
-        rows = cursor.fetchall()
-        return {"datos": [dict(zip([column[0] for column in cursor.description], row)) for row in rows]}
+        result = await fetch_query_as_json(query)
+        result_dict = json.loads(result)
+        return { "data": result_dict, "version": "0.0.3" }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener datos: {str(e)}")
-    
-@app.get("/test-connection")
-def test_db_connection():
-    connection = get_connection()
-    if connection:
-        connection.close()  # Cerrar la conexión si se estableció
-        return {"message": "Conexión exitosa a la base de datos"}
-    else:
-        raise HTTPException(status_code=500, detail="Error al conectar a la base de datos")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Union[str, None] = None):
+    return {"item_id": item_id, "q": q}
+
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8000)
