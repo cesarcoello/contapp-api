@@ -5,7 +5,11 @@ from fastapi import FastAPI, HTTPException, Request
 from utils.database import fetch_query_as_json
 from fastapi.middleware.cors import CORSMiddleware
 
+from models.UserLogin import UserLogin
+from models.UserRegister import UserRegister
+
 from controllers.google import login_google , auth_callback_google
+from controllers.firebase import register_user_firebase, login_user_firebase
 
 app = FastAPI()
 
@@ -41,3 +45,11 @@ async def logingoogle():
 @app.get("/auth/google/callback")
 async def authcallbackgoogle(request: Request):
     return await auth_callback_google(request)
+
+@app.post("/register")
+async def register(user: UserRegister):
+    return await register_user_firebase(user)
+
+@app.post("/login/custom")
+async def login_custom(user: UserRegister):
+    return await login_user_firebase(user)
