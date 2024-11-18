@@ -1,9 +1,11 @@
 import json
 import uvicorn
 from typing import Union
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from utils.database import fetch_query_as_json
 from fastapi.middleware.cors import CORSMiddleware
+
+from controllers.google import login_google , auth_callback_google
 
 app = FastAPI()
 
@@ -31,3 +33,11 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+@app.get("/login/google")
+async def logingoogle():
+    return await login_google()
+
+@app.get("/auth/google/callback")
+async def authcallbackgoogle(request: Request):
+    return await auth_callback_google(request)
