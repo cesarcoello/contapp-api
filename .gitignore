@@ -15,3 +15,6 @@ __pycache__/
 
 # Archivos de logs
 *.log
+
+#carpeta secrets (sensitive)
+secrets/
