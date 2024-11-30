@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.get("/")
 async def read_root():
-    query = "select * from contapp.personas"
+    query = "select * from contapp.Users"
     try:
         result = await fetch_query_as_json(query)
         result_dict = json.loads(result)
