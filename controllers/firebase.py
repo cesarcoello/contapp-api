@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Inicializar la app de Firebase Admin
-cred = credentials.Certificate("secrets/admin-firebasesdk.json")
+cred = credentials.Certificate("secrets/firebase-secrets.json")
 firebase_admin.initialize_app(cred)
 
 
@@ -64,7 +64,7 @@ async def register_user_firebase(user: UserRegister):
             detail=f"Error al registrar usuario: {e}"
         )
 
-    query = f"exec contapp.create_user @email = '{user.email}', @firstname = '{user.firstname}', @lastname = '{user.lastname}'"
+    query = f" exec contapp.create_user @email = '{user.email}', @firstname = '{user.firstname}', @lastname = '{user.lastname}'"
     result = {}
     try:
 
