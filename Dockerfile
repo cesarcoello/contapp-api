@@ -25,7 +25,6 @@ COPY . .
 
 # delete .env file
 RUN rm .env
-RUN rm Dockerfile
 
 # Expone el puerto que utilizará la aplicación
 EXPOSE 8000
