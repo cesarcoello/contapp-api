@@ -24,8 +24,19 @@ app.add_middleware(
 )
 
 @app.get("/")
-async def read_root():
-    return {"message": "Hola Mundo"}
+async def read_root(response: Response):
+    response.headers["Cache-Control"] = "no-cache"
+    query = "select * from contapp.hello"
+    try:
+        result = await fetch_query_as_json(query)
+        result_dict = json.loads(result)
+        result_dict = {
+            "data": result_dict
+            , "version": "0.0.1"
+        }
+        return result_dict
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/register")

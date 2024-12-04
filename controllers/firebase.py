@@ -104,7 +104,7 @@ async def login_user_firebase(user: UserLogin):
                         , firstname
                         , lastname
                         , active
-                    from [contapp].[Users]
+                    from [exampleprep].[users]
                     where email = '{ user.email }'
                     """
 

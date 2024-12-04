@@ -1,0 +1,11 @@
+docker buildx build --platform linux/amd64 -t api-contapp-dev-123:latest . --load
+docker run -d -p 8000:8000 --name my-fastapi-container --env-file .env api-contapp-dev-123:latest
+
+az login
+az acr login --name acrcontappdev123
+
+docker tag api-contapp-dev-123:latest acrcontappdev123.azurecr.io/api-contapp-dev-123:latest
+docker tag api-contapp-dev-123:latest acrcontappdev123.azurecr.io/api-contapp-dev-123:0.0.1
+
+docker push acrcontappdev123.azurecr.io/api-contapp-dev-123:latest
+docker push acrcontappdev123.azurecr.io/api-contapp-dev-123:0.0.1
