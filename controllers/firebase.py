@@ -104,7 +104,7 @@ async def login_user_firebase(user: UserLogin):
                         , firstname
                         , lastname
                         , active
-                    from [exampleprep].[users]
+                    from [contapp].[Users]
                     where email = '{ user.email }'
                     """
 
@@ -137,7 +137,7 @@ async def login_user_firebase(user: UserLogin):
 async def generate_activation_code(email: EmailActivation):
 
     code = random.randint(100000, 999999)
-    query = f" exec exampleprep.generate_activation_code @email = '{email.email}', @code = {code}"
+    query = f" exec contapp.generate_activation_code @email = '{email.email}', @code = {code}"
     result = {}
     try:
         result_json = await fetch_query_as_json(query, is_procedure=True)
